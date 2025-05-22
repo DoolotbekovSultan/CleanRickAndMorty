@@ -1,5 +1,6 @@
 package com.sultan.cleanrickandmorty.presentation.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -27,7 +28,12 @@ class CharacterAdapter() : ListAdapter<Character.Result, CharacterAdapter.ViewHo
 
     class ViewHolder(val binding : CharacterHolderBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(characterResponse: Character.Result) {
-            Glide.with(binding.image).load(characterResponse.image).into(binding.image)
+            Log.d("ololo", "bind: image = ${characterResponse.image}")
+            Glide.with(binding.image.context)
+                .load(characterResponse.image)
+                .centerCrop()
+                .placeholder(android.R.color.darker_gray)
+                .into(binding.image)
         }
     }
 

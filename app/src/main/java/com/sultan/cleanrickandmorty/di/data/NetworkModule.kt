@@ -1,6 +1,8 @@
 package com.sultan.cleanrickandmorty.di.data
 
 import com.sultan.cleanrickandmorty.data.datasource.CharacterService
+import com.sultan.cleanrickandmorty.data.repository.CharacterRepositoryImpl
+import com.sultan.cleanrickandmorty.domain.repository.CharacterRepository
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,8 +13,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 val networkModule = module {
     single { provideRetrofit(get()) }
     single { provideOkHttpClient(get()) }
-    single { provideHttpLoggingInterceptor() }
+    single<Interceptor> { provideHttpLoggingInterceptor() }
     single { provideAppService(get()) }
+    single<CharacterRepository> { CharacterRepositoryImpl(get()) }
 }
 
 
@@ -21,7 +24,7 @@ fun provideRetrofit (
     okHttpClient: OkHttpClient
 ) : Retrofit = Retrofit.Builder()
     .client(okHttpClient)
-    .baseUrl("https://rickandmortyapi.com/api")
+    .baseUrl("https://rickandmortyapi.com/api/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
