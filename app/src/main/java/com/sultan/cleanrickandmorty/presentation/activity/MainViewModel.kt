@@ -17,7 +17,9 @@ class MainViewModel(
 
     fun getCharacter() {
         viewModelScope.launch {
-            _character.value = getCharacterUseCase()
+            getCharacterUseCase.invoke().observeForever { data ->
+                _character.postValue(data)
+            }
         }
     }
 }

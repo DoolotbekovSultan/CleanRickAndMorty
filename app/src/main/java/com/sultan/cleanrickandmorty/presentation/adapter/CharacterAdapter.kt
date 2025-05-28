@@ -10,7 +10,9 @@ import com.bumptech.glide.Glide
 import com.sultan.cleanrickandmorty.databinding.CharacterHolderBinding
 import com.sultan.cleanrickandmorty.domain.model.Character
 
-class CharacterAdapter() : ListAdapter<Character.Result, CharacterAdapter.ViewHolder>(DiffCallback()) {
+class CharacterAdapter(
+    private val onClickListener: OnClickListener
+) : ListAdapter<Character.Result, CharacterAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -26,15 +28,24 @@ class CharacterAdapter() : ListAdapter<Character.Result, CharacterAdapter.ViewHo
         holder.bind(getItem(position))
     }
 
-    class ViewHolder(val binding : CharacterHolderBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(val binding : CharacterHolderBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(characterResponse: Character.Result) {
             Log.d("ololo", "bind: image = ${characterResponse.image}")
+
             Glide.with(binding.image.context)
                 .load(characterResponse.image)
                 .centerCrop()
                 .placeholder(android.R.color.darker_gray)
                 .into(binding.image)
+
+            binding.root.setOnClickListener {
+                onClickListener.onClick(characterResponse.id)
+            }
         }
+    }
+
+    interface OnClickListener {
+        fun onClick(id : Int)
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Character.Result>() {

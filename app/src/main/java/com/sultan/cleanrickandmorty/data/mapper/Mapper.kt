@@ -9,5 +9,6 @@ fun CharacterDto.toCharacter() : Character = Character (
 
 fun CharacterDto.Result.toResult() : Character.Result = Character.Result(
     image = this.image,
-    name = this.name
+    name = this.name,
+    id = this.id
 )
