@@ -4,9 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.sultan.cleanrickandmorty.R
 import com.sultan.cleanrickandmorty.databinding.ActivityMainBinding
 import com.sultan.cleanrickandmorty.presentation.adapter.CharacterAdapter
+import com.sultan.cleanrickandmorty.util.UIState
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), CharacterAdapter.OnClickListener {
@@ -33,9 +38,25 @@ class MainActivity : AppCompatActivity(), CharacterAdapter.OnClickListener {
     }
 
     private fun initializeObserver() {
-        viewModel.character.observe(this) { characterResponse ->
-            Log.e("ololo", "initializeObserver: $characterResponse" )
-            adapter.submitList(characterResponse?.results)
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.characterState.collect { state ->
+                    when (state) {
+                        is UIState.Empty -> {
+
+                        }
+                        is UIState.Error -> {
+
+                        }
+                        is UIState.Loading -> {
+
+                        }
+                        is UIState.Success -> {
+                            adapter.submitList(state.data.results)
+                        }
+                    }
+                }
+            }
         }
     }
 

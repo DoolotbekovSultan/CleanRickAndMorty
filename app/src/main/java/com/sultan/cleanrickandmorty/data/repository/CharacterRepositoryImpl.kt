@@ -8,28 +8,31 @@ import com.sultan.cleanrickandmorty.data.mapper.toCharacter
 import com.sultan.cleanrickandmorty.data.mapper.toResult
 import com.sultan.cleanrickandmorty.domain.model.Character
 import com.sultan.cleanrickandmorty.domain.repository.CharacterRepository
+import com.sultan.cleanrickandmorty.util.Either
 import kotlinx.coroutines.Dispatchers
-import okhttp3.Dispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import okio.IOException
 
 class CharacterRepositoryImpl (
     private val service : CharacterService
 ) : CharacterRepository {
-    override suspend fun getCharacter() : LiveData<Character> = liveData(Dispatchers.IO) {
+    override suspend fun getCharacter() : Flow<Either<String, Character>> = flow {
         try {
             val response = service.getCharacter()
-            emit(response.toCharacter())
+            emit(Either.Right(response.toCharacter()))
         } catch (e : IOException) {
-            Log.e("exception", "getCharacter: ${e.localizedMessage}")
+            emit(Either.Left(e.localizedMessage ?: "Unknown error!"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
-    override suspend fun getCharacterById(id : Int) : LiveData<Character.Result> = liveData(Dispatchers.IO) {
+    override suspend fun getCharacterById(id : Int) : Flow<Either<String, Character.Result>> = flow {
         try {
             val response = service.getCharacterById(id)
-            emit(response.toResult())
+            emit(Either.Right(response.toResult()))
         } catch (e : IOException) {
-            Log.e("exception", "getCharacterById: ${e.localizedMessage}")
+            emit(Either.Left(e.localizedMessage ?: "Unknown error!"))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }
