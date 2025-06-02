@@ -2,8 +2,13 @@ package com.sultan.cleanrickandmorty.presentation.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
 import com.sultan.cleanrickandmorty.databinding.ActivityDetailBinding
+import com.sultan.cleanrickandmorty.util.UIState
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DetailActivity : AppCompatActivity() {
@@ -24,13 +29,34 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun initializeObserver() {
-        viewModel.result.observe(this) { data ->
-            binding.name.text = data.name
-            Glide.with(binding.image.context)
-                .load(data.image)
-                .centerCrop()
-                .placeholder(android.R.color.darker_gray)
-                .into(binding.image)
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.resultState.collect { state ->
+                    viewModel.resultState.collect { state ->
+                        when (state) {
+                            is UIState.Empty -> {
+
+                            }
+                            is UIState.Error -> {
+
+                            }
+                            is UIState.Loading -> {
+
+                            }
+                            is UIState.Success -> {
+                                binding.name.text = state.data.name
+                                Glide.with(binding.image.context)
+                                    .load(state.data.image)
+                                    .centerCrop()
+                                    .placeholder(android.R.color.darker_gray)
+                                    .into(binding.image)
+                            }
+                        }
+                    }
+
+                }
+            }
         }
+
     }
 }
